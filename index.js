@@ -1,29 +1,17 @@
 'use strict';
 
 const express = require('express');
-const path = require('path');
 const app = express();
 
 app.set('port', (process.env.PORT || 5000));
 
-app.use(express.static(path.join(__dirname, '/public')));
-
-app.get('/', (_, res) => {
-  res.sendFile('index.html');
-});
-
-app.get('/:input', (req, res) => {
-  const parsedDate = isNaN(parseInt(req.params.input)) ? new Date(req.params.input) : new Date(parseInt(req.params.input));
-
-  if (isNaN(parsedDate.getTime())) {
-    res.status(400).end("Sorry, it seems like the string you queried couldn't be parsed. Check API docs for examples.");
-  }
-  else {
-    res.json({
-      unix: parsedDate.getTime(),
-      natural: parsedDate.toDateString()
-    });
-  }
+app.get('/', (req, res) => {
+  console.log(req.ip);
+  res.json({
+    ip: req.ip,
+    os: /\(([^)]+)\)/.exec(req.get('user-agent'))[1],
+    language: req.get('accept-language').split(',')[0]
+  });
 });
 
 app.listen(app.get('port'), function() {
